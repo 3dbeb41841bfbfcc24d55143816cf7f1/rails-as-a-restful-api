@@ -1,3 +1,13 @@
+---
+title: Rails API
+type: Lesson
+duration: '"1:25"'
+creator:
+    name: Marc Wright
+    city: ATL
+competencies: Databases
+---
+
 # rails-as-a-restful-api
 
 
@@ -5,14 +15,20 @@ We're gonna create a Rails app that only uses the API, no views. We'll then acce
 
 > The original idea behind Rails API was to serve as a starting point for a version of Rails better suited for JS-heavy apps. As of today, Rails API provides: trimmed down controllers and middleware stack together with a matching set of generators, all specifically tailored for API type applications.
 
+Objectives
+
+- Get Started
+- Scaffold a Resource
+
 
 ## Let's get started...
 
 Check out the [Rails API Gem](https://github.com/rails-api/rails-api) documentation.
 
-1) run `gem install rails-api`
+1) Run `gem install rails-api` to install the gem on our system.
 
-2) run `rails-api new my_api`
+
+2) Run `rails-api new my_api --database=postgresql`
 
 3) Add this to the `Gemfile` then `bundle`:
 
@@ -22,12 +38,15 @@ gem 'rack-cors'
 gem 'active_model_serializers'
 ```
 
+[rack-cors](https://github.com/cyu/rack-cors) will help us with CORS request errors. Serialize will help us serve our data as JSON.
 
-4) Add to `application_controller.rb`
+
+4) Let's include our serialization gem to Rails by adding the following to `application_controller.rb`
 
 ```ruby
 include ActionController::Serialization
 ```
+> By the way, what's going on with our inheritance here?
 
 5) Add to `application.rb` inside the class:
 
@@ -38,17 +57,17 @@ class Application < Rails::Application
 end
 ```
 
-> This makes Rails more lightweight by only using middlewares need for our API.
+> This keeps Rails lightweight by only inculding those middlewares needed for an API.
 
 ## Let's scaffold a todo resource
 
-1) From the command line run
+1) To scaffold our Todo resource...
 
 ```ruby
 rails g scaffold todo title completed:boolean order:integer
 ```
 
-2) Run `rake db:create` (if using postgresql) then `rake db:migrate`
+2) Run `rake db:create && rake db:migrate`
 
 3) Take a look at our Todos Controller...
 
@@ -58,7 +77,7 @@ rails g scaffold todo title completed:boolean order:integer
 
 4) Also check out `routes.rb`...
 
-- What is different?
+- What is different? Why?
 - run `rake routes`
 
 5) How are we going to determine how our JSON data is returned? Using serializers:
@@ -76,13 +95,13 @@ rails g serializer todo title completed order
 
 2) Open Insominia
 
-3) How do we make a request for all the todos? Make `GET` request to this URL to get all the todos...
+3) How do we make a request for all the todos? Make a `GET` request to this URL to get all the todos...
 
 ```ruby
 http://localhost:3000/todos.json
 ```
 
-4) How could we `POST` a new todo to our database?
+4) We should return an empty array. How could we `POST` a new todo to our database?
 
 ```ruby
 # POST request to this route
@@ -105,9 +124,7 @@ http://localhost:3000/todos.json
 - Add 2 more todos to the database
 - `UPDATE` one of the todos
 - `DELETE` one of the todos
-
-**BONUS**
-- Add a new field to our Todo model and make it accessible to our API for all CRUD actions.
+- Add a `location` field to our Todo model and make it accessible to our API for all CRUD actions.
 
 ##Part 2 - using AJAX to access our DB
 
@@ -167,7 +184,11 @@ before_filter :add_allow_credentials_headers
 # development.rb
 config.debug_exception_response_format = :api
 ```
-### Helpful Tutorials
-[Rails API Docs]('https://github.com/rails-api/rails-api')
 
-[Rails API Tutorial]('https://wyeworks.com/blog/2015/6/11/how-to-build-a-rails-5-api-only-and-backbone-application')
+don't forget about :null_session
+### Helpful Tutorials
+[Rails API Docs](https://github.com/rails-api/rails-api)
+
+[Rails API Tutorial](https://wyeworks.com/blog/2015/6/11/how-to-build-a-rails-5-api-only-and-backbone-application)
+
+[CORS + Rails](http://leopard.in.ua/2012/07/08/using-cors-with-rails/)
