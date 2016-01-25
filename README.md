@@ -17,18 +17,19 @@ We're gonna create a Rails app that only uses the API, no views. We'll then acce
 
 Objectives
 
-- Get Started
-- Scaffold a Resource
+- Create a Rails API to serve JSON data only (no views)
+- Test our REST-ful endpoints using Insomnia
+- BONUS - comsume our API using jQuery
 
 
 ## Let's get started...
 
 Check out the [Rails API Gem](https://github.com/rails-api/rails-api) documentation.
 
-1) Run `gem install rails-api` to install the gem on our system.
+1) Run `gem install rails-api` to install the gem on our system. You'll need to re-open your Terminal window for the commands to work.
 
 
-2) Run `rails-api new my_api --database=postgresql`
+2) Run `rails-api new my_api --database=postgresql -T`
 
 3) Add this to the `Gemfile` then `bundle`:
 
@@ -80,20 +81,13 @@ rails g scaffold todo title completed:boolean order:integer
 - What is different? Why?
 - run `rake routes`
 
-5) How are we going to determine how our JSON data is returned? Using serializers:
-
-```ruby
-# run on the command line
-rails g serializer todo title completed order
-```
-
-> This determines what info is sent to the requesters. We now have a working backend!
+> Serializers will determine what info is sent to the requesters. We now have a working backend!
 
 ## Create a todo using the API
 
 1) Fire up our `rails s`
 
-2) Open Insominia
+2) Open [Insominia](https://chrome.google.com/webstore/detail/insomnia-rest-client/gmodihnfibbjdecbanmpmbmeffnmloel)
 
 3) How do we make a request for all the todos? Make a `GET` request to this URL to get all the todos...
 
@@ -145,14 +139,14 @@ http://localhost:3000/todos.json
 
 
 	  var data = $.getJSON('http://localhost:3000/todos.json', function(d){
-    	$('#stuff').text(d.todos);
-  		console.log(d.todos);
-  		});
+    					$('#stuff').text(d.todos);
+  						console.log(d.todos);
+  					});
 
 	  var weather = $.getJSON('http://api.openweathermap.org/data/2.5/weather?q=London,uk&appid=2de143494c0b295cca9337e1e96b00e0', function(d){
-	    $('#weather').text(d.weather[0].main);
-	  console.log(d.weather[0]);
-	  });
+	    	$('#weather').text(d.weather[0].main);
+	  		console.log(d.weather[0]);
+	 	 });
 
 	</script>
 </body>
