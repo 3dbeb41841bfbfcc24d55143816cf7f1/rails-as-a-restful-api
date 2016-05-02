@@ -8,149 +8,161 @@ creator:
 competencies: Databases
 ---
 
-# rails-as-a-restful-api
-In unit 3 we're gonna learn how to create and consume an API. As an intro, we're gonna see what this looks like using Rails since you should be intimately familar with the framework by now. This Rails app will have no views, however, we'll test our API using [Insominia](https://chrome.google.com/webstore/detail/insomnia-rest-client/gmodihnfibbjdecbanmpmbmeffnmloel). Later, we'll use jQuery to access it and render info to a page.
+# Rails as a REST-ful API
+In Unit 3 we're gonna learn how to create and consume an API. As an intro, we're gonna see what this looks like using Rails since you should be intimately familar with the framework by now. This Rails app will have no views, however, we'll test our API using [Insominia](https://chrome.google.com/webstore/detail/insomnia-rest-client/gmodihnfibbjdecbanmpmbmeffnmloel). Later, we'll use jQuery to access it and render data onto a page.
 
 > The original idea behind Rails API was to serve as a starting point for a version of Rails better suited for JS-heavy apps. As of today, Rails API provides: trimmed down controllers and middleware stack together with a matching set of generators, all specifically tailored for API type applications.
 
-Objectives
+You can actually check this out by going to an index view of your Project 2 and typing `.json` to the end of the URL. Note- this *should* work if you scaffolded your resources.
+
+**Objectives**
 
 - Create a Rails API to serve JSON data only (no views)
 - Test our REST-ful endpoints using [Insominia](https://chrome.google.com/webstore/detail/insomnia-rest-client/gmodihnfibbjdecbanmpmbmeffnmloel)
-- **BONUS** - comsume our API using jQuery
+- Consume our API using jQuery
 
 
-## Let's get started...
+## Let's get started with the Rails API...
 
 Check out the [Rails API Gem](https://github.com/rails-api/rails-api) documentation.
 
-1. Let's run `gem install rails-api` to install the gem on our system. You'll need to re-open your Terminal window for the commands to work.
+1. Let's run `gem install rails-api` to install the gem. You may need to re-open your Terminal window for the commands to work.
 
 2. Run `rails-api new my_api --database=postgresql -T` to create a new API only Rails app.
 
-3. Add this to the `Gemfile` then `bundle`:
+3. Add this to the `Gemfile` then `bundle install`:
 
 	```ruby
 	gem 'rack-cors'
 	gem 'active_model_serializers'
 	```
-[rack-cors](https://github.com/cyu/rack-cors) will help us with CORS request errors. Serialize will help us serve our data as JSON.
+[rack-cors](https://github.com/cyu/rack-cors) will help us with CORS request errors. Serialize will help us serve our data as a serialized JSON object.
 
 4. Let's include our serialization gem by adding the following to 	`application_controller.rb` inside the `class` declaration:
 
 	```ruby
-	include ActionController::Serialization
+	class ApplicationController < ActionController::API
+		include ActionController::Serialization
+	end
 	```
 > By the way, what's going on with our inheritance here?
 
-5. Add to `application.rb` inside the `class` declaration:
+5. Add to the following to `application.rb` inside the `class` declaration:
 
 ```ruby
-class Application < Rails::Application
-	config.api_only = true
+module MyApiAgain
+	class Application < Rails::Application
+		config.api_only = true		
+		...		
+	end
 end
 
 # This keeps Rails lightweight by only inculding those middlewares needed for an API.
 ```
-## Let's scaffold a todo resource
+## Let's scaffold a Todo resource
 
-1) To scaffold our Todo resource...
+1. To scaffold our Todo resource:
 
-```ruby
-rails g scaffold todo title completed:boolean order:integer
-```
+	```ruby
+	rails g scaffold todo title completed:boolean order:integer
+	```
 
-2) Run `rake db:create && rake db:migrate`
+2. Run `rake db:create && rake db:migrate`
 
-3) Take a look at our `Todos Controller`
+3. Take a look at `controllers/todos_controller.rb`
 
-- What do you notice that's different from a regular scaffolded controller?
-- Which actions are we missing? Why?
-- Why do the actions only respond with JSON?
+	- What do you notice that's different from a regular scaffolded controller?
+	- Which actions are we missing? Why?
+	- Why do the actions only respond with JSON?
 
-4) Next, check out `routes.rb`
-
-- What is different? Why?
-- run `rake routes`
+4.	 Next, check out `config/routes.rb` then run `rake routes`. What is different and why?
 
 > Serializers will determine what info is sent to the requesters. We now have a working backend!
 
 ## Create a todo using the API
 
-1) Fire up our `rails s`
+1. Fire up our `rails s` and goto `http://localhost:3000/todos`. What is returned?
 
-2) Add the Chrome extension [Insominia](https://chrome.google.com/webstore/detail/insomnia-rest-client/gmodihnfibbjdecbanmpmbmeffnmloel) and open it. ***There will be a little bit of set-up involved the first time you open it. We will walk through it.***
+2. Add the Chrome extension [Insominia](https://chrome.google.com/webstore/detail/insomnia-rest-client/gmodihnfibbjdecbanmpmbmeffnmloel) and open it. We're gonna use Insomnia to make HTTP requests and interact with our Rails server via the API we created. ***There will be a little bit of set-up involved the first time you open it. We will walk through it.***
 
-3) Let's make a `GET` request for all the todos. It's essentially the same URL to grab an index view, only we add `.json` to the end of it.
+3. Let's make a `GET` request for all the todos. It's essentially the same URL to grab an index view, only we add `.json` to the end of it.
 
-```ruby
-http://localhost:3000/todos.json
-```
+	```ruby
+	http://localhost:3000/todos.json
+	```
+![screenshot](insomnia_get_request.png)
 
-4) This should return an empty array because we have no todos in our database. How could we `POST` a new `Todo` to our database?
+4. This should return an empty array because we have no todos in our database. How could we `POST` a new `Todo` to our database?
 
-```ruby
-# send a POST request to this route
-http://localhost:3000/todos.json
+	```ruby
+	# send a POST request to this route
+	http://localhost:3000/todos.json
 
-# Our Todo object, just like what we'd see in our params hash.
+	# Our Todo object, just like what 	we'd see in our params hash.
 
-{
-    "todo": {
-        "title": "Adding our First Todo!",
-        "completed": false,
-        "order": 20
-    }
-}
-```
+	{
+ 	   "todo": {
+    	    "title": "Adding our First Todo!",
+    	    "completed": false,
+    	    "order": 20
+    	}
+	}
+	```
+![screenshot](insomnia_post_request.png)
 
-5) Try the `GET` request from step 3 again. You should have 1 `Todo` in your array.
+5. After step 4 we should see a `Success 201` message! Try the `GET` request from step 3 again. You should now have one `Todo` in your array.
+
+	![screenshot](insomnia_get_request_one_todo.png)
 
 **YOU DO**
 
-- Add 2 more todos to the database
-- `UPDATE` one of the todos
-- `DELETE` one of the todos
-- Add a `location` field to our Todo model and make it accessible to our API for all CRUD actions.
+- Using Insomnia, add two more todos to the database
+- Using Insomnia, `UPDATE` one of the todos
+- Using Insomnia, `DELETE` one of the todos
+- Add a `location` field to our Todo model and make it accessible to our API for all CRUD actions. **HINT:** check out the `app/serializers/todo_serializers.rb` file. What is it doing?
 
-##Part 2 - using AJAX to access our DB
+##Part 2 - Using AJAX to access our DB
 
-- Create a new, separate directory called `rails_api_frontend_sample`. Create an `index.html` file and add the code below.
+The beauty of hosting our database separately is that it is decoupled from the client. This gives us flexibility and options. We could create an Angular front-end, an Ionic mobile app, or a static html page and they can all access our API. 
+
+We're gonna dive into AngularJS in unit 4. However, we can accomplish some of the same behavior using jQuery. Let's see what that looks like by building a basic `index.html` page that will consume our API.
+
+1. In your `ga` folder, create a new folder called `rails_api_frontend_sample`. Create an `index.html` file and add the code below.
  
-```html
+	```html
 <!DOCTYPE html>
 <html>
 <head>
 	<title>AJAX!</title>
 </head>
 <body>
-	<div id="stuff"></div>
-	<div id="weather"></div>
+	<div id="todo"></div>
 
 	<script type="text/javascript" src='https://code.jquery.com/jquery-2.2.0.min.js'></script>
 	<script type="text/javascript">
 
 
-      var data = $.getJSON('http://localhost:3000/todos.json', function(d){
-                        $('#stuff').text("Todo title: " + d.todos[0].title);
-                        console.log(d.todos[0]);
-                    });
-
-      var weather = $.getJSON('http://api.openweathermap.org/data/2.5/weather?q=Atlanta&appid=3f09349479850459fbb04e503859d422', function(d){
-            $('#weather').text("Weather conditions:  " + d.weather[0].main);
-            console.log(d.weather[0]);
-         });
+      $.getJSON('http://localhost:3000/todos.json', function(data){
+         $('#todo').text("Todo title: " + data.todos[0].title);
+         console.log(data.todos[0]);
+      });
 
     </script>
 </body>
 </html>
-```
+	```
 
-- Start Python Simple Server by running `python -m SimpleHTTPServer 8080`. This  is a basic HTTP server that you have installed on your Mac. It's a simple, lightweight option to serve static assets (HTML, CSS, JS). We need a server in order to make AJAX requests.
+2. Let's break down what `$.getJSON()` is doing:
+	- `$.getJSON()` is a jQuery method that takes a URL and a callback as arguments.
+	- The `data` object that is returned can be passed in to the callback itself as an argument.
+	- We insert the title of our Todo into the `#todo` element using the jQuery method `.text()`.
 
-- If you encounter any [CORS](http://leopard.in.ua/2012/07/08/using-cors-with-rails/) errors or issues, add this Chrome extension called [Allow-Control-Request-Origin](https://chrome.google.com/webstore/detail/allow-control-allow-origi/nlfbmbojpeacfghkpbjhddihlkkiljbi) and turn it on. Check out the link above to dig deeper into CORS.
 
-- Add this code to `application_controller.rb` and `developement.rb` if you STILL encounter any CORS errors or issues: 
+2. Start Python Simple Server by running `python -m SimpleHTTPServer 8080`. This  is a basic HTTP server that you have installed on your Mac. It's a simple, lightweight option to serve static assets (HTML, CSS, JS). We need a server in order to make AJAX requests.
+
+3. If you encounter any [CORS](http://leopard.in.ua/2012/07/08/using-cors-with-rails/) errors or issues, add this Chrome extension called [Allow-Control-Request-Origin](https://chrome.google.com/webstore/detail/allow-control-allow-origi/nlfbmbojpeacfghkpbjhddihlkkiljbi) and turn it on.
+
+4. Add this code to `application_controller.rb` and `developement.rb` if you STILL encounter any CORS errors or issues: 
 
 ```ruby
 # application_controller.rb
@@ -174,11 +186,32 @@ before_filter :add_allow_credentials_headers
 config.debug_exception_response_format = :api
 ```
 
-don't forget about :null_session
+> Also, try adding `:null_session` to `application_controller.rb` if you encounter more Insomnia errors.
 
-### BONUS
 
-Using the lesson above, see if you can access any movies from the [Open Movie Database](http://omdbapi.com/)
+
+
+## BONUS
+
+Using the lesson above, see if you can access a movie from the [Open Movie Database](http://omdbapi.com/) and render some data. 
+
+## DOUBLE BONUS
+
+Using the lesson above, see if you can render Atlanta's current weather data from the [Open Weather Map API](http://openweathermap.org/api). NOTE - You'll need to register for an API key.
+
+
+<details>
+  <summary>Possible solution</summary>
+
+```javascript
+$.getJSON('http://api.openweathermap.org/data/2.5/weather?q=Atlanta&appid=<PUT-YOUR-API-KEY-HERE>', function(data){
+	$('#weather').text("Weather conditions:  " + data.weather[0].main);
+   console.log(data.weather[0]);
+});
+```
+       
+</details>
+
 ### Helpful Tutorials
 [Rails API Docs](https://github.com/rails-api/rails-api)
 
