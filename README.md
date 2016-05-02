@@ -201,13 +201,41 @@ Using the lesson above, see if you can render Atlanta's current weather data fro
 
 
 <details>
-  <summary>Possible solution</summary>
+  <summary>Possible solution to Bonuses</summary>
 
 ```javascript
-$.getJSON('http://api.openweathermap.org/data/2.5/weather?q=Atlanta&appid=<PUT-YOUR-API-KEY-HERE>', function(data){
-	$('#weather').text("Weather conditions:  " + data.weather[0].main);
-   console.log(data.weather[0]);
-});
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>AJAX!</title>
+	</head>
+	<body>
+		<h1>AJAX!</h1>
+		<div id="todo"></div><br>
+		<div id="movie"></div><br>
+		<div id="weather"></div>
+
+		<script type="text/javascript" src='https://code.jquery.com/jquery-2.2.0.min.js'></script>
+		<script type="text/javascript">
+
+
+		  $.getJSON('http://localhost:3000/todos.json', function(data){
+		     $('#todo').text("Todo location: " + data.todos[1].location);
+		     console.log(data);
+		  });
+
+		  $.getJSON('http://www.omdbapi.com/?t=batman&y=1989&plot=full&r=json', function(data){
+		  	$("#movie").html("<div>Title: " + data.Title + "</div><div>Release: " + data.Released + "</div>");
+		  })
+
+		  $.getJSON('http://api.openweathermap.org/data/2.5/weather?q=Atlanta&appid=< YOUR-API-KEY-HERE >', function(data){
+		  	$("#weather").text("Atlanta's current weather is: " + data.weather[0].description);
+		  })
+
+
+		</script>
+	</body>
+</html>
 ```
        
 </details>
